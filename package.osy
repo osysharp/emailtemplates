@@ -1,0 +1,23 @@
+// Osysharp.EmailTemplates — mail that looks designed, rendered from data. The parts an `[Email]` template is built from:
+// a layout with its preview line, logo and footer, then headings, text, buttons, pictures and the lines of a receipt.
+//
+// ⚑ IT FORMATS MAIL; IT DOES NOT SEND IT. A template answers a `RenderedEmail` — subject, HTML and its plain-text twin —
+//   and whatever sends mail sends that (Osysharp.Resend, or any provider). The name says so on purpose (owner,
+//   2026-09-27): "EmailTemplates" so nobody mistakes it for a way to send e-mail.
+//
+// ⭐ IT IS ORDINARY OSY#. Every part is an `[Email] component` over the platform's email atoms, so an app that wants a
+//    different button writes its own component the same way — `osy get EmailButton` gives it this one to start from.
+//    It wears the app's theme: every colour, size and face below is a token (`Colors.Primary`), and the renderer
+//    writes the APP's value for it into the mail.
+package Osysharp.EmailTemplates {
+  version     "0.1.1";
+  minPlatform "0.9.0";
+  summary     "mail that looks designed — a layout with preview line, logo and footer, headings, text, buttons, pictures and receipt lines, in the app's own theme — and the mail blocks staff arrange in a mail's region.";
+  model "model/*.osy";
+  // The theme the parts name their colours and sizes in. An app's own theme overrides any of it.
+  use Osysharp.Ui;
+  // ⚑ The mail BLOCKS (model/Blocks.osy) need no `use Osysharp.Blocks;` here: in an app that arranges (it uses
+  //   Osysharp.Blocks, and puts a `Region` in a mail) they are what staff place; in one that does not, they are
+  //   ordinary parts — a receipt needs no arrangement tables, and no sign-in for their preview rule.
+  tests "tests";
+}

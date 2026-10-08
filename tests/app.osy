@@ -1,0 +1,8 @@
+// The producer's test project for Osysharp.EmailTemplates — it reads the working tree through `osy.workspace`.
+app EmailTemplatesKitTests {
+  model "model/**/*.osy";
+  tests "**/*.test.osy";
+  use Osysharp.EmailTemplates@0;
+  use Osysharp.Blocks;
+  use Osysharp.Ui;
+}

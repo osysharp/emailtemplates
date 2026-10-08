@@ -1,0 +1,96 @@
+// The MAIL BLOCKS — the pieces staff arrange in a mail's region (D-BLOCKS1 slice 3). Each is an `[Email]` part marked
+// `[Block]`: its parameters are the fields staff fill in at the desk, and their types choose the editor (words in the
+// Markdown editor, a picture, a page to link to, one of the theme's colours). A mail places them in a region, with the
+// arrangement the code writes as its default:
+//
+//     [Email]
+//     public component Welcome(Member member) {
+//       subject => $"Welcome, {member.Name}";
+//       placeholders { member.name => member.Name; }
+//       render {
+//         EmailLayout("The Rowing Club") {
+//           Region("welcome", allow: [EmailWords, EmailPicture, EmailQuote, EmailAction]) {
+//             EmailWords(words: "Welcome aboard, **{member.name}**.");
+//           }
+//         }
+//       }
+//     }
+//
+// ⚑ THE WORDS KEEP THE MAIL'S PLACEHOLDERS. Every block's words are written with `placeholders: true`, so `{member.name}`
+//   is filled from the mail the block is placed in — escaped, a value never becomes markup — and a word naming one the
+//   mail does not fill is refused when staff save it.
+//
+// ⚑ EVERY LOOK IS A TOKEN, as in the parts: a colour a block offers is one of the theme's, by the theme's own name.
+
+namespace Osysharp.EmailTemplates;
+
+/// A paragraph in the mail's own voice — what the mail says first, in the reader's language.
+[Block("Words", Hint = "A paragraph — bold, italics and links. It may use the mail's {placeholders}.")]
+[Email]
+public component EmailWords([Label("Words"), Hint("Use the mail's placeholders, such as {customer.name}."),
+                             Sample("Thank you — your order is on its way to being packed.")] Markdown words) {
+  render {
+    Markdown(words, placeholders: true, fontSize: FontSize.Subhead, color: Colors.OnBg, lineHeight: 1.6);
+  }
+}
+
+/// A heading and the words under it — a new part of the mail.
+[Block("Heading and words", Hint = "A heading with a paragraph under it.")]
+[Email]
+public component EmailHeadline([Label("Heading"), MaxLength(80), Sample("Brewed for the season")] string heading,
+                               [Label("Words")] Markdown words = "") {
+  render {
+    Stack(gap: 2) {
+      Text(heading, placeholders: true, fontSize: FontSize.Heading, fontWeight: FontWeight.Bold, fontFamily: Font.Display,
+           color: Colors.OnBg, lineHeight: 1.25);
+      if (words != "") { Markdown(words, placeholders: true, fontSize: FontSize.Body, color: Colors.OnBg, lineHeight: 1.6); }
+    }
+  }
+}
+
+/// A photograph across the mail — the season's picture, a new arrival.
+[Block("Picture", Hint = "A photograph across the mail — one of the shop's, or one you upload.")]
+[Email]
+public component EmailPicture([Label("Photograph")] Picture picture,
+                              [Label("What it shows"), Hint("Read aloud to a reader who cannot see it."), MaxLength(120),
+                               Sample("A photograph")] string alt = "") {
+  render {
+    Image(picture: picture, alt: alt, w: 552, rounded: Radius.Md);
+  }
+}
+
+/// A button to a page — the one thing the reader should do next.
+[Block("Button", Hint = "A button to a page of the shop, or to another address.")]
+[Email]
+public component EmailAction([Label("What it says"), MaxLength(40), Sample("See what is new")] string label,
+                             [Label("Where it goes")] PageLink link = "/") {
+  render {
+    Link(link, text: label, bg: Colors.Primary, color: Colors.OnPrimary, px: 6, py: 3, rounded: Radius.Md,
+         fontWeight: FontWeight.Semibold);
+  }
+}
+
+/// Something somebody said, set apart — a review, a line from the roaster.
+[Block("Quote", Hint = "Words somebody said, and who said them.")]
+[Email]
+public component EmailQuote([Label("What they said"), MaxLength(300), Sample("The best cup of the week, every week.")] string quote,
+                            [Label("Who said it"), MaxLength(80)] string who = "",
+                            [Label("Ground")] Color ground = Colors.Muted) {
+  render {
+    Box(bg: ground, rounded: Radius.Md, px: 5, py: 4) {
+      Stack(gap: 2) {
+        Text(quote, placeholders: true, fontSize: FontSize.Subhead, fontStyle: FontStyle.Italic, color: Colors.On(ground, Colors.OnBg), lineHeight: 1.5);
+        if (who != "") { Text("— " + who, fontSize: FontSize.Label, color: Colors.On(ground, Colors.TextMuted)); }
+      }
+    }
+  }
+}
+
+/// Small print at the foot of the mail — opening hours, a note about delivery.
+[Block("Small print", Hint = "A quiet line at the foot of the mail.")]
+[Email]
+public component EmailSmallPrint([Label("Words"), Sample("We roast on Tuesdays and send on Wednesdays.")] Markdown words) {
+  render {
+    Markdown(words, placeholders: true, fontSize: FontSize.Label, color: Colors.TextMuted, lineHeight: 1.5);
+  }
+}

@@ -1,0 +1,206 @@
+// sv (Svenska): the words of EmailTemplatesKitTests, translated.
+// Written and kept in step with the source by `osy translate`: a new text arrives as `=> null`, a text
+// whose source changed keeps its old translation in a `was` clause. The words are yours to edit.
+// Source language: en.
+
+translations sv {
+  // ── Kronor ──
+  /// Kronor · text in an email
+  /// placeholders: {amount} = amount (decimal)
+  /// shown through Kronor()
+  mailText "{amount} kr" => null;
+
+  // ── Osysharp.Blocks · DraftProblems ──
+  /// DraftProblems · text on the page
+  /// placeholders: {label} = label (string)
+  text "{label} has to be in it — add it back." => "{label} måste finnas med – lägg tillbaka den.";
+
+  // ── Osysharp.Blocks · PlaceholderRefusal ──
+  /// PlaceholderRefusal · text on the page
+  /// placeholders: {named} = named (string)
+  text "{named} is not a placeholder this mail fills — it offers none." => "{named} är ingen platshållare som det här mejlet fyller i – det erbjuder inga.";
+  /// PlaceholderRefusal · text on the page
+  /// placeholders: {named} = named (string), {offered} = offered (string)
+  text "{named} is not a placeholder this mail fills — it offers {offered}." => "{named} är ingen platshållare som det här mejlet fyller i – det erbjuder {offered}.";
+
+  // ── Osysharp.Blocks · RemoveBlock ──
+  /// RemoveBlock · an error message
+  /// placeholders: {label} = label (string)
+  /// shown through ValidationException
+  error "{label} stays — this region must keep it. Move it where you want it instead." => "{label} stannar – den här delen måste ha den kvar. Flytta den dit du vill i stället.";
+
+  // ── Osysharp.EmailTemplates · EmailLayout ──
+  /// EmailLayout · a link or button in an email · at most ~17 characters
+  mailLink "Unsubscribe" => "Avsluta prenumerationen";
+
+  // ── Osysharp.EmailTemplates · __BlockSpec_EmailAction ──
+  /// __BlockSpec_EmailAction · text on the page
+  text "A button to a page of the shop, or to another address." => "En knapp till en sida i butiken eller till en annan adress.";
+  /// __BlockSpec_EmailAction · text on the page
+  text "Button" => "Knapp";
+  /// __BlockSpec_EmailAction · text on the page
+  text "What it says" => "Vad den säger";
+  /// __BlockSpec_EmailAction · text on the page
+  text "Where it goes" => "Vart den leder";
+
+  // ── Osysharp.EmailTemplates · __BlockSpec_EmailHeadline ──
+  /// __BlockSpec_EmailHeadline · text on the page
+  text "A heading with a paragraph under it." => "En rubrik med ett stycke under.";
+  /// __BlockSpec_EmailHeadline · text on the page
+  text "Heading and words" => "Rubrik och ord";
+
+  // ── Osysharp.EmailTemplates · __BlockSpec_EmailPicture ──
+  /// __BlockSpec_EmailPicture · text on the page
+  text "A photograph across the mail — one of the shop's, or one you upload." => "Ett fotografi över hela mejlet – ett av butikens eller ett du laddar upp.";
+  /// __BlockSpec_EmailPicture · text on the page
+  text "Photograph" => "Fotografi";
+  /// __BlockSpec_EmailPicture · text on the page
+  text "Picture" => "Bild";
+  /// __BlockSpec_EmailPicture · text on the page
+  text "Read aloud to a reader who cannot see it." => "Läses upp för en läsare som inte kan se den.";
+  /// __BlockSpec_EmailPicture · text on the page
+  text "What it shows" => "Vad den visar";
+
+  // ── Osysharp.EmailTemplates · __BlockSpec_EmailQuote ──
+  /// __BlockSpec_EmailQuote · text on the page
+  text "Ground" => "Bakgrund";
+  /// __BlockSpec_EmailQuote · text on the page
+  text "Quote" => "Citat";
+  /// __BlockSpec_EmailQuote · text on the page
+  text "What they said" => "Vad de sa";
+  /// __BlockSpec_EmailQuote · text on the page
+  text "Words somebody said, and who said them." => "Något någon sa, och vem som sa det.";
+
+  // ── Osysharp.EmailTemplates · __BlockSpec_EmailSmallPrint ──
+  /// __BlockSpec_EmailSmallPrint · text on the page
+  text "A quiet line at the foot of the mail." => "En stilla rad längst ned i mejlet.";
+  /// __BlockSpec_EmailSmallPrint · text on the page
+  text "Small print" => "Finstilt";
+
+  // ── Osysharp.EmailTemplates · __BlockSpec_EmailWords ──
+  /// __BlockSpec_EmailWords · text on the page
+  text "A paragraph — bold, italics and links. It may use the mail's {placeholders}." => "Ett stycke – fetstil, kursiv och länkar. Det får använda mejlets {placeholders}.";
+  /// __BlockSpec_EmailWords · text on the page
+  text "Use the mail's placeholders, such as {customer.name}." => "Använd mejlets platshållare, till exempel {customer.name}.";
+
+  // ── Osysharp.Ui · WeekdayRow ──
+  /// WeekdayRow · text on the page
+  text "F" key "weekday-initial-friday" => null;
+  /// WeekdayRow · text on the page
+  text "M" key "weekday-initial-monday" => null;
+  /// WeekdayRow · text on the page
+  text "S" key "weekday-initial-saturday" => null;
+  /// WeekdayRow · text on the page
+  text "S" key "weekday-initial-sunday" => null;
+  /// WeekdayRow · text on the page
+  text "T" key "weekday-initial-tuesday" => null;
+  /// WeekdayRow · text on the page
+  text "T" key "weekday-initial-thursday" => null;
+  /// WeekdayRow · text on the page
+  text "W" key "weekday-initial-wednesday" => null;
+
+  // ── SaleLines ──
+  /// SaleLines · a heading
+  /// shown through SaleLines.heading
+  heading "Your order" => "Din order";
+
+  // ── SaleReceipt ──
+  /// SaleReceipt · an image's description for screen readers
+  /// shown through EmailLayout.brand
+  /// also in ThanksMail
+  alt "Grounds & Grapes" => null;
+  /// SaleReceipt · a button's label · at most ~20 characters
+  /// shown through EmailButton.label
+  /// beside: "Your order is reserved and on its way to being packed.", "Total", "GIFT-7Q2K", "Questions? Reply to this mail."
+  /// also in ThanksMail
+  button "See your order" => null;
+  /// SaleReceipt · a label (a field, a list item, a menu entry) · at most ~11 characters
+  /// shown through EmailTotal.label
+  /// also in SaleLines
+  label "Total" => null;
+  /// SaleReceipt · the preview line an inbox shows beside an email's subject
+  /// placeholders: {sale.Customer} = sale.Customer (string), {sale.Reference} = sale.Reference (string)
+  /// shown through EmailLayout.preview
+  mailPreview "Thank you, {sale.Customer} — receipt {sale.Reference}" => null;
+  /// SaleReceipt · an email's subject line
+  /// placeholders: {sale.Reference} = sale.Reference (string)
+  mailSubject "Your receipt {sale.Reference}" => null;
+  /// SaleReceipt · text in an email
+  /// shown through EmailCode.code
+  /// beside: "Your order is reserved and on its way to being packed.", "Total", "See your order", "Questions? Reply to this mail."
+  mailText "GIFT-7Q2K" => null;
+  /// SaleReceipt · text in an email
+  /// shown through EmailLayout.address
+  mailText "Storgatan 1, 111 22 Stockholm" => null;
+  /// SaleReceipt · text on the page
+  /// shown through EmailNote.text
+  /// beside: "Your order is reserved and on its way to being packed.", "Total", "See your order", "GIFT-7Q2K"
+  text "Questions? Reply to this mail." => null;
+  /// SaleReceipt · text on the page
+  /// placeholders: {sale.Customer} = sale.Customer (string)
+  /// shown through EmailHeading.text
+  /// beside: "Your order is reserved and on its way to being packed.", "Total", "See your order", "GIFT-7Q2K"
+  text "Thank you, {sale.Customer}" => null;
+  /// SaleReceipt · text on the page
+  /// shown through EmailText.text
+  /// beside: "Total", "See your order", "GIFT-7Q2K", "Questions? Reply to this mail."
+  text "Your order is reserved and on its way to being packed." => null;
+
+  // ── ThanksMail ──
+  /// ThanksMail · an email's subject line
+  /// placeholders: {sale.Customer} = sale.Customer (string)
+  mailSubject "Thank you, {sale.Customer}" => null;
+  /// ThanksMail · text on the page
+  /// shown through EmailHeading.text
+  /// beside: "See your order"
+  text "Thank you" => null;
+
+  // ── __BlockSpec_EmailHeadline ──
+  /// __BlockSpec_EmailHeadline · text on the page
+  /// also in __BlockSpec_SaleLines
+  text "Heading" => "Rubrik";
+
+  // ── __BlockSpec_EmailQuote ──
+  /// __BlockSpec_EmailQuote · text on the page
+  /// also in __MailBlockSample
+  text "Who said it" => "Vem som sa det";
+
+  // ── __BlockSpec_EmailWords ──
+  /// __BlockSpec_EmailWords · text on the page
+  /// also in __BlockSpec_EmailHeadline
+  /// also in __BlockSpec_EmailSmallPrint
+  text "Words" => "Ord";
+
+  // ── __BlockSpec_SaleLines ──
+  /// __BlockSpec_SaleLines · text in an email
+  /// also in __RegionSpec_Thanks
+  mailText "Your order" => "Din order";
+  /// __BlockSpec_SaleLines · text on the page
+  text "The lines of the sale and its total." => null;
+  /// __BlockSpec_SaleLines · text on the page
+  text "What was bought" => null;
+
+  // ── __MailBlockSample ──
+  /// __MailBlockSample · text on the page
+  text "A photograph" => "Ett fotografi";
+  /// __MailBlockSample · text on the page
+  text "Brewed for the season" => "Bryggt för säsongen";
+  /// __MailBlockSample · text on the page
+  text "See what is new" => "Se vad som är nytt";
+  /// __MailBlockSample · text on the page
+  text "Thank you — your order is on its way to being packed." => "Tack – din order är på väg att packas.";
+  /// __MailBlockSample · text on the page
+  text "The best cup of the week, every week." => "Veckans bästa kopp, varje vecka.";
+  /// __MailBlockSample · text on the page
+  text "We roast on Tuesdays and send on Wednesdays." => "Vi rostar på tisdagar och skickar på onsdagar.";
+
+  // ── __RegionSpec_Thanks ──
+  /// __RegionSpec_Thanks · the default wording of an email paragraph staff can edit (Markdown, keep {placeholders})
+  mailWords "Thank you, **{customer.name}** — order {order.reference} is on its way to being packed." => "Tack, **{customer.name}** — order {order.reference} är på väg att packas.";
+
+  // ── __SiteBlocks.Site ──
+  /// __SiteBlocks.Site · text on the page
+  text "Muted" => "Dämpad";
+  /// __SiteBlocks.Site · text on the page
+  text "Primary" => "Primär";
+}

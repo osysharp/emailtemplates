@@ -1,0 +1,61 @@
+// What a reader receives from a mail built with the kit: the subject, an HTML body a mail client can lay out, and the
+// plain-text twin saying the same thing.
+
+Sale ASale() {
+  var sale = new Sale { Reference = "GG-1042", Customer = "Ada" };
+  new SaleLine { Sale = sale, Name = "Ethiopia Yirgacheffe", Size = "250 g", Quantity = 2, Price = 89m };
+  new SaleLine { Sale = sale, Name = "Paper filters", Quantity = 1, Price = 29m };
+  return sale;
+}
+
+[Test]
+void TheReceiptSaysWhatWasBought_InBothTheHtmlAndTheText() {
+  var mail = SaleReceipt(ASale());
+  Assert.Equal("Your receipt GG-1042", mail.Subject);
+  foreach (var words in new List<string> { "Thank you, Ada", "2 × Ethiopia Yirgacheffe", "250 g", "178.00 kr",
+                                            "1 × Paper filters", "29.00 kr", "Total", "207.00 kr", "See your order",
+                                            "GIFT-7Q2K", "Questions? Reply to this mail." }) {
+    Assert.Contains(words, mail.Text);
+  }
+  Assert.Contains("See your order: https://shop.example.com/orders/GG-1042", mail.Text);
+  Assert.Contains("207.00&nbsp;kr", mail.Html);                 // an amount and its currency never part
+}
+
+[Test]
+void TheLayoutIsTablesWithEveryStyleInline() {
+  var html = SaleReceipt(ASale()).Html;
+  Assert.Contains("role=\"presentation\"", html);
+  Assert.DoesNotContain("<style", html);
+  Assert.DoesNotContain(" class=", html);
+  Assert.DoesNotContain("<script", html);
+  Assert.DoesNotContain("var(--", html);
+  // The card is 600 pixels and centred — the width every mail client lays out well.
+  Assert.Contains("max-width:600px", html);
+  Assert.Contains("align=\"center\"", html);
+}
+
+[Test]
+void TheMailWearsTheAppsTheme() {
+  var html = SaleReceipt(ASale()).Html;
+  // The app's brand colour, not the kit's own indigo.
+  Assert.Contains("bgcolor=\"#C2410C\"", html);
+  Assert.DoesNotContain("#4F46E5", html);
+}
+
+/// What the receipt LOOKS like — under `osy test --pixels` a real browser lays the mail out the way a mail client
+/// does, and the photograph lands in `osy-shots/`. It asserts nothing: it is there to be looked at.
+[Test]
+void TheReceiptIsPhotographed() {
+  Ui.Shot("emailtemplates-receipt", SaleReceipt(ASale()));
+}
+
+[Test]
+void TheFooterCarriesTheAddressAndAnUnsubscribeLink() {
+  var mail = SaleReceipt(ASale());
+  Assert.Contains("Grounds &amp; Grapes · Storgatan 1, 111 22 Stockholm", mail.Html);
+  Assert.Contains("href=\"https://shop.example.com/unsubscribe\"", mail.Html);
+  Assert.Contains("Unsubscribe (https://shop.example.com/unsubscribe)", mail.Text);
+  // The preview line is the inbox's — in the HTML, not read out in the text.
+  Assert.Contains("Thank you, Ada — receipt GG-1042", mail.Html);
+  Assert.DoesNotContain("receipt GG-1042", mail.Text);
+}

@@ -1,0 +1,59 @@
+// A mail whose words staff own: its layout is code, and a REGION in it holds the blocks staff arrange — the fixture the
+// block tests render.
+
+using Osysharp.EmailTemplates;
+using Osysharp.Blocks;
+
+/// Who arranges the mail — a region's arrangement is kept per signed-in person's preview (Osysharp.Blocks), so an app
+/// whose staff arrange mail has people who sign in.
+[Principal]
+public entity Staffer {
+  [Required, Unique, MaxLength(200)] string Email;
+  security { allow read when IsAuthenticated where Id == user.Id; }
+}
+
+// Who arranges what staff arrange. In this fixture everybody is "staff"; a real app answers with its own staff role.
+policy ArrangesPages => IsAuthenticated || IsAnonymous;
+
+/// A block of this app's own, handed the sale from the mail it is placed in — the lines the customer bought.
+[Block("What was bought", Hint = "The lines of the sale and its total.")]
+[Email]
+public component SaleLines(Sale sale, [Label("Heading"), MaxLength(60)] string heading = "Your order") {
+  render {
+    Stack(gap: 2) {
+      Text(heading, fontSize: FontSize.Subhead, fontWeight: FontWeight.Bold, color: Colors.OnBg);
+      EmailTable() {
+        foreach (var line in sale.Lines) {
+          EmailRow($"{line.Quantity} × {line.Name}", Kronor(line.Price * line.Quantity), detail: line.Size);
+        }
+        EmailTotal("Total", Kronor(sale.Lines.Sum(l => l.Price * l.Quantity)));
+      }
+    }
+  }
+}
+
+[Email]
+public component ThanksMail(Sale sale) {
+  subject => $"Thank you, {sale.Customer}";
+  placeholders {
+    customer.name => sale.Customer;
+    order.reference => sale.Reference;
+  }
+  render {
+    EmailLayout("Grounds & Grapes") {
+      EmailHeading("Thank you");
+      Region("thanks", allow: [EmailWords, EmailHeadline, EmailPicture, EmailAction, EmailQuote, EmailSmallPrint, SaleLines],
+             require: [SaleLines], sample: ThanksSample) {
+        EmailWords(words: "Thank you, **{customer.name}** — order {order.reference} is on its way to being packed.");
+        SaleLines();
+      }
+      EmailButton("See your order", $"https://shop.example.com/orders/{sale.Reference}");
+    }
+  }
+}
+
+/// The thanks mail for the latest sale, in `language` — what the desk shows beside the region's blocks.
+public RenderedEmail? ThanksSample(string language) {
+  var sale = Sale.OrderByDescending(s => s.Reference).FirstOrDefault();
+  return sale == null ? null : ThanksMail(sale, language: language);
+}

@@ -1,0 +1,164 @@
+// A mail's REGION — the words and the pieces staff own inside a mail whose layout the code owns (D-BLOCKS1 slice 3).
+// Staff arrange it the way they arrange a page's: a draft, published; words per language; placeholders filled from the
+// mail and escaped; a preview that is never sent.
+
+using Osysharp.Blocks;
+
+Sale Ada(string name) {
+  var sale = new Sale { Reference = "GG-2001", Customer = name };
+  new SaleLine { Sale = sale, Name = "Paper filters", Quantity = 1, Price = 29m };
+  return sale;
+}
+
+/// The words block of the thanks region, in a draft of it — made from the live arrangement or the code's default.
+Guid WordsIn(Guid draft) {
+  return DraftOf(draft, "en").Blocks.First(b => b.Block == "Osysharp.EmailTemplates.EmailWords").Id;
+}
+
+[Test]
+void the_code_s_arrangement_is_the_mail_until_staff_change_it() {
+  var mail = ThanksMail(Ada("Ada"));
+  Assert.Contains("Thank you, <strong>Ada</strong> — order <span style=\"white-space:nowrap;\">GG-2001</span> is on its way to being packed.", mail.Html);
+  Assert.Contains("Thank you, Ada — order GG-2001 is on its way", mail.Text);
+  // The block handed the sale from the mail: its lines.
+  Assert.Contains("1 × Paper filters", mail.Text);
+  Assert.Contains("29.00 kr", mail.Text);
+  Assert.Equal(2, mail.Placeholders.Count);
+  Assert.False(mail.IsPreview);
+}
+
+[Test]
+void staff_words_published_in_the_region_are_the_mail_without_a_deploy() {
+  var draft = EditRegion(MainVersion().Id, "thanks", "");
+  Assert.Equal("", SaveBlockValue(WordsIn(draft), "en", new BlockValue { Name = "words", Text = "Welcome back, {customer.name}! We are on it." }));
+  // A draft is nobody's mail yet.
+  Assert.Contains("on its way to being packed", ThanksMail(Ada("Ada")).Text);
+  Assert.Equal("", PublishRegion(draft));
+  var mail = ThanksMail(Ada("Ada"));
+  Assert.Contains("Welcome back, Ada! We are on it.", mail.Text);
+  Assert.DoesNotContain("on its way to being packed", mail.Html);
+}
+
+/// Staff place a block of their own choosing — a quote on one of the theme's grounds — and move it above the words.
+[Test]
+void staff_add_and_move_a_block() {
+  var draft = EditRegion(MainVersion().Id, "thanks", "");
+  var quote = AddBlock(draft, "Osysharp.EmailTemplates.EmailQuote", 0);
+  Assert.Equal("", SaveBlockValue(quote, "en", new BlockValue { Name = "quote", Text = "Best filters in town, {customer.name}." }));
+  Assert.Equal("", SaveBlockValue(quote, "en", new BlockValue { Name = "who", Text = "The roaster" }));
+  Assert.Equal("", PublishRegion(draft));
+  var text = ThanksMail(Ada("Ada")).Text;
+  Assert.Contains("Best filters in town, Ada.", text);
+  Assert.Contains("— The roaster", text);
+  Assert.True(text.IndexOf("Best filters in town") < text.IndexOf("on its way to being packed"));
+}
+
+/// ⛔ A PLACEHOLDER'S VALUE IS DATA, AND DATA NEVER BECOMES MARKUP — in a block's Markdown and in its line of text.
+[Test]
+void a_placeholder_value_cannot_inject_markup_into_the_mail() {
+  var draft = EditRegion(MainVersion().Id, "thanks", "");
+  var quote = AddBlock(draft, "Osysharp.EmailTemplates.EmailQuote", 0);
+  Assert.Equal("", SaveBlockValue(quote, "en", new BlockValue { Name = "quote", Text = "Thanks, {customer.name}" }));
+  Assert.Equal("", PublishRegion(draft));
+  var mail = ThanksMail(Ada("[Win a prize](https://evil.example) **now** <b>x</b>"));
+  Assert.DoesNotContain("href=\"https://evil.example\"", mail.Html);
+  Assert.DoesNotContain("<b>x</b>", mail.Html);
+  Assert.DoesNotContain("<strong>now</strong>", mail.Html);
+  Assert.Contains("[Win a prize](https://evil.example) **now** &lt;b&gt;x&lt;/b&gt;", mail.Html);
+}
+
+/// ⛔ …AND NEITHER DO THE WORDS STAFF WRITE: a tag is shown as text, and a `javascript:` link is not a link.
+[Test]
+void staff_words_cannot_inject_html_or_script_into_the_mail() {
+  var draft = EditRegion(MainVersion().Id, "thanks", "");
+  Assert.Equal("", SaveBlockValue(WordsIn(draft), "en", new BlockValue { Name = "words",
+    Text = "Hi <script>alert(1)</script> <img src=x onerror=alert(1)> [click](javascript:alert(1))" }));
+  Assert.Equal("", PublishRegion(draft));
+  var html = ThanksMail(Ada("Ada")).Html;
+  Assert.DoesNotContain("<script", html);
+  Assert.DoesNotContain("<img src=x", html);
+  Assert.DoesNotContain("href=\"javascript:", html);
+  Assert.Contains("&lt;script&gt;", html);
+}
+
+/// ⛔ A WORD NAMING A PLACEHOLDER THE MAIL DOES NOT FILL IS REFUSED WHEN IT IS SAVED — by name, with the ones it offers —
+/// so a customer is never sent `{customer.nmae}`.
+[Test]
+void a_word_naming_a_placeholder_the_mail_does_not_fill_is_refused_by_name() {
+  var draft = EditRegion(MainVersion().Id, "thanks", "");
+  var refusal = SaveBlockValue(WordsIn(draft), "en", new BlockValue { Name = "words", Text = "Hi {customer.nmae}" });
+  Assert.Contains("{customer.nmae} is not a placeholder this mail fills", refusal);
+  Assert.Contains("{customer.name}, {order.reference}", refusal);
+  Assert.Contains("on its way to being packed", ThanksMail(Ada("Ada")).Text);
+}
+
+/// The block the code requires stays: staff may move it, never take the last one out.
+[Test]
+void a_required_block_cannot_be_taken_out() {
+  var draft = EditRegion(MainVersion().Id, "thanks", "");
+  var lines = DraftOf(draft, "en").Blocks.Single(b => b.Block == "SaleLines");
+  Assert.True(lines.Kept);
+  Assert.Throws(() => RemoveBlock(lines.Id));
+  MoveBlock(lines.Id, -1);
+  Assert.Equal("", PublishRegion(draft));
+  var text = ThanksMail(Ada("Ada")).Text;
+  Assert.True(text.IndexOf("Paper filters") < text.IndexOf("on its way to being packed"));
+}
+
+/// ⛔ WORDS ARE PER LANGUAGE: a mail says the words staff wrote in ITS language, and a language they wrote nothing in
+/// says the code's default as the locale file translates it — never another language's words.
+[Test]
+void words_are_kept_per_language_and_never_cross_to_another() {
+  var draft = EditRegion(MainVersion().Id, "thanks", "");
+  var words = WordsIn(draft);
+  Assert.Equal("", SaveBlockValue(words, "en", new BlockValue { Name = "words", Text = "Cheers, {customer.name} — packing now." }));
+  Assert.Equal("", PublishRegion(draft));
+  Assert.Contains("Cheers, Ada — packing now.", ThanksMail(Ada("Ada")).Text);
+  // A Swedish reader: nothing written in Swedish — the code's own words in Swedish, never the English staff wrote.
+  var swedish = ThanksMail(Ada("Ada"), language: "sv");
+  Assert.DoesNotContain("Cheers", swedish.Text);
+  Assert.Contains("Tack, Ada — order GG-2001 är på väg att packas.", swedish.Text);
+  // …and once they write Swedish, the Swedish reader gets theirs while the English one keeps the English.
+  var again = EditRegion(MainVersion().Id, "thanks", "");
+  Assert.Equal("", SaveBlockValue(WordsIn(again), "sv", new BlockValue { Name = "words", Text = "Hej {customer.name} — vi packar nu." }));
+  Assert.Equal("", PublishRegion(again));
+  Assert.Contains("Hej Ada — vi packar nu.", ThanksMail(Ada("Ada"), language: "sv").Text);
+  Assert.Contains("Cheers, Ada — packing now.", ThanksMail(Ada("Ada")).Text);
+}
+
+/// ⛔ A PREVIEW IS NEVER SENT. A member of staff looking at a draft on this browser sees it in the mail — and the mail
+/// says it is a preview, which a sender refuses. Stop previewing and the same mail is the live one again.
+[Test]
+void a_mail_rendered_in_a_preview_shows_the_draft_and_says_it_is_one() {
+  var main = MainVersion();
+  var draft = EditRegion(main.Id, "thanks", "");
+  Assert.Equal("", SaveBlockValue(WordsIn(draft), "en", new BlockValue { Name = "words", Text = "A draft for {customer.name}." }));
+  StartSitePreview(main.Id, null, true);
+  var previewed = ThanksMail(Ada("Ada"));
+  Assert.True(previewed.IsPreview);
+  Assert.Contains("A draft for Ada.", previewed.Text);
+  StopSitePreview();
+  var live = ThanksMail(Ada("Ada"));
+  Assert.False(live.IsPreview);
+  Assert.DoesNotContain("A draft for", live.Text);
+}
+
+/// The desk's preview of the region: the mail around it, rendered for the latest sale in a language — and each block
+/// drawn alone, small, for the "Add a block" list.
+[Test]
+void the_desk_can_preview_the_mail_and_draw_each_block() {
+  Ada("Ada");
+  UnitOfWork.Commit();
+  var sample = MailSampleOf("thanks", "en");
+  Assert.NotNull(sample);
+  Assert.Contains("on its way to being packed", sample!.Text);
+  var quote = MailBlockSampleOf("Osysharp.EmailTemplates.EmailQuote");
+  Assert.NotNull(quote);
+  Assert.Contains("The best cup of the week, every week.", quote!.Text);
+  // A block handed the sale from the mail has nothing to be drawn for on its own.
+  Assert.Null(MailBlockSampleOf("SaleLines"));
+  var region = SiteRegions().Single(r => r.Name == "thanks");
+  Assert.True(region.Mail);
+  Assert.Equal("SaleLines", region.Require.Single());
+  Assert.Equal("customer.name, order.reference", string.Join(", ", region.Placeholders));
+}

@@ -1,0 +1,167 @@
+// The parts a mail is built from. Each is an `[Email] component` — a part, not a whole mail, because none of them has a
+// `subject =>`. An app's mail puts them inside an `EmailLayout`:
+//
+//     [Email]
+//     public component Welcome(Customer c) {
+//       subject => $"Welcome to Acme, {c.Name}";
+//       render {
+//         EmailLayout("Acme", preview: "Your account is ready", address: "1 Main St, Springfield") {
+//           EmailHeading($"Welcome, {c.Name}");
+//           EmailText("Your account is ready. Sign in any time to see your orders.");
+//           EmailButton("Sign in", "https://acme.example/sign-in");
+//         }
+//       }
+//     }
+//
+// ⚑ EVERY LOOK IS A TOKEN. Colours, sizes, corners and faces are named from the theme (`Colors.Primary`,
+//   `FontSize.Title`), and the renderer writes the APP's value for each into the mail — so a shop whose brand is
+//   orange sends orange buttons without touching this file.
+
+namespace Osysharp.EmailTemplates;
+
+/// The frame every mail sits in: the sender's own PAGE — its background and its type — in a 600-pixel column, the brand
+/// (a logo when there is one) at the top, the mail under it, and a footer below a rule — the sender's address, and an
+/// unsubscribe link when the mail is one a reader can stop.
+///
+/// ⚑ A MAIL IS THE SENDER'S PAGE, NOT ONE OF ITS CARDS. It reads on the theme's `Bg` in its `OnBg`, the way the app's
+///   own pages read. It used to sit on a `Surface` card, and a theme whose cards are a grey panel on a white page (a
+///   shop that is black type on white) then sent every mail as a grey card — measured on a real order confirmation, it
+///   looked like no shop at all. A panel INSIDE a mail (`EmailCode`) is still a panel.
+///
+/// `preview` is the line an inbox shows beside the subject; without one, the client shows the mail's first words.
+/// `address` is where the sender is — a marketing mail must carry it, and a receipt is better for it.
+/// `unsubscribe` is the address that stops this kind of mail; give it for anything a reader signed up to, never for a
+/// receipt they cannot stop receiving.
+[Email]
+public component EmailLayout(string brand, string? preview = null, string? logo = null, string? address = null,
+                             string? unsubscribe = null, string? footer = null) {
+  render {
+    Box(bg: Colors.Bg, px: 3, py: 8) {
+      if (preview != null) { Preview(preview); }
+      Stack(gap: 4, align: Align.Center) {
+        Box(w: 600, bg: Colors.Bg, color: Colors.OnBg, px: 6, py: 4) {
+          Stack(gap: 6) {
+            if (logo != null) {
+              // Carried INSIDE the mail when it is a file the app stores, so the brand shows even where a client blocks
+              // remote pictures — Outlook does, by default.
+              Image(logo, alt: brand, h: 40, inline: true);
+            } else {
+              Text(brand, fontSize: FontSize.Heading, fontWeight: FontWeight.Bold, fontFamily: Font.Display,
+                   color: Colors.OnBg);
+            }
+            Stack(gap: 4) { Slot; }
+          }
+        }
+        Box(w: 600, px: 6) {
+          Stack(gap: 1, align: Align.Center, borderTW: 1, border: Colors.Border, pt: 4) {
+            if (footer != null) { Text(footer, fontSize: FontSize.Caption, color: Colors.TextMuted, textAlign: TextAlign.Center); }
+            Text(address == null ? brand : $"{brand} · {address}", fontSize: FontSize.Caption, color: Colors.TextMuted,
+                 textAlign: TextAlign.Center);
+            if (unsubscribe != null) {
+              Link(unsubscribe, text: "Unsubscribe", fontSize: FontSize.Caption, color: Colors.TextMuted);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/// The mail's headline — what it is about, in the theme's display face.
+[Email]
+public component EmailHeading(string text) {
+  render {
+    Text(text, fontSize: FontSize.Title, fontWeight: FontWeight.Bold, fontFamily: Font.Display, color: Colors.OnBg,
+         lineHeight: 1.25);
+  }
+}
+
+/// A paragraph. A line break in the text is kept.
+[Email]
+public component EmailText(string text) {
+  render {
+    Text(text, fontSize: FontSize.Subhead, color: Colors.OnBg, lineHeight: 1.6);
+  }
+}
+
+/// A quieter paragraph — small print, a note under a table, "sent because you asked to be told".
+[Email]
+public component EmailNote(string text) {
+  render {
+    Text(text, fontSize: FontSize.Label, color: Colors.TextMuted, lineHeight: 1.5);
+  }
+}
+
+/// The one thing the reader should do next — a button that is a link in every mail client, Outlook included.
+[Email]
+public component EmailButton(string label, string href) {
+  render {
+    Link(href, text: label, bg: Colors.Primary, color: Colors.OnPrimary, px: 6, py: 3, rounded: Radius.Md,
+         fontWeight: FontWeight.Semibold);
+  }
+}
+
+/// A picture — a product, a map, a code to scan. By its ADDRESS by default (a path is sent as the app's own absolute
+/// address), which keeps a mail small: right for photographs. With `inline: true` a file the app STORES travels inside
+/// the mail instead and shows even where a client blocks remote pictures: right for a small, generated picture the
+/// reader needs, such as a QR code to show at a counter.
+[Email]
+public component EmailImage(string src, string alt, int width = 552, bool inline = false) {
+  render {
+    Image(src, alt: alt, w: width, rounded: Radius.Md, inline: inline);
+  }
+}
+
+/// A code the reader types or reads out — a gift code, a return code — large, spaced and easy to copy.
+[Email]
+public component EmailCode(string code) {
+  render {
+    Box(bg: Colors.Muted, rounded: Radius.Md, py: 4, px: 4, textAlign: TextAlign.Center) {
+      Text(code, fontSize: FontSize.Title, fontWeight: FontWeight.Bold, fontFamily: Font.Mono, letterSpacing: 3,
+           color: Colors.OnBg, textAlign: TextAlign.Center);
+    }
+  }
+}
+
+/// A rule between two parts of a mail.
+[Email]
+public component EmailDivider() {
+  render {
+    Divider(color: Colors.Border, py: 2);
+  }
+}
+
+/// A receipt's lines — put `EmailRow`s and an `EmailTotal` inside.
+[Email]
+public component EmailTable() {
+  render {
+    Stack(gap: 2, borderTW: 1, border: Colors.Border, pt: 3) { Slot; }
+  }
+}
+
+/// One line of a receipt: what it is (with a detail under it, such as a size) and what it costs.
+[Email]
+public component EmailRow(string label, string value, string? detail = null) {
+  render {
+    Row(justify: Justify.Between, gap: 4) {
+      Stack(gap: 0) {
+        Text(label, fontSize: FontSize.Body, color: Colors.OnBg);
+        if (detail != null) { Text(detail, fontSize: FontSize.Caption, color: Colors.TextMuted); }
+      }
+      Text(value, fontSize: FontSize.Body, color: Colors.OnBg);
+    }
+  }
+}
+
+/// The line a receipt ends on — the total, in bold, under a rule.
+[Email]
+public component EmailTotal(string label, string value) {
+  render {
+    Box(borderTW: 1, border: Colors.Border, pt: 3) {
+      Row(justify: Justify.Between, gap: 4) {
+        Text(label, fontSize: FontSize.Subhead, fontWeight: FontWeight.Bold, color: Colors.OnBg);
+        Text(value, fontSize: FontSize.Subhead, fontWeight: FontWeight.Bold, color: Colors.OnBg);
+      }
+    }
+  }
+}

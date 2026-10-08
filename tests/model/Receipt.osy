@@ -1,0 +1,47 @@
+// A small shop's receipt, written the way an app writes one with this kit — the fixture the tests render.
+
+using Osysharp.EmailTemplates;
+
+// The app's own brand colour. A mail must wear it: the button is drawn in THIS, not in the kit's indigo.
+theme Brand { Colors { Primary = "#C2410C"; } }
+
+public entity Sale {
+  [Required, MaxLength(40)] string Reference;
+  [Required, MaxLength(120)] string Customer;
+  [ForeignKey(Sale)] SaleLine[] Lines;
+  security { allow read, create when IsAuthenticated || IsAnonymous; }
+}
+
+public entity SaleLine {
+  [Required] Sale Sale;
+  [Required, MaxLength(120)] string Name;
+  [MaxLength(60)] string? Size;
+  int Quantity;
+  decimal Price;
+  security { allow read, create when IsAuthenticated || IsAnonymous; }
+}
+
+public string Kronor(decimal amount) { return $"{amount:0.00} kr"; }
+
+[Email]
+public component SaleReceipt(Sale sale) {
+  subject => $"Your receipt {sale.Reference}";
+  render {
+    EmailLayout("Grounds & Grapes", preview: $"Thank you, {sale.Customer} — receipt {sale.Reference}",
+                address: "Storgatan 1, 111 22 Stockholm", unsubscribe: "https://shop.example.com/unsubscribe") {
+      EmailHeading($"Thank you, {sale.Customer}");
+      EmailText("Your order is reserved and on its way to being packed.");
+      EmailTable() {
+        foreach (var line in sale.Lines) {
+          EmailRow($"{line.Quantity} × {line.Name}", Kronor(line.Price * line.Quantity), detail: line.Size);
+        }
+        EmailTotal("Total", Kronor(sale.Lines.Sum(l => l.Price * l.Quantity)));
+      }
+      EmailButton("See your order", $"https://shop.example.com/orders/{sale.Reference}");
+      EmailCode("GIFT-7Q2K");
+      EmailDivider();
+      EmailNote("Questions? Reply to this mail.");
+    }
+  }
+}
+
