@@ -24,9 +24,9 @@ namespace Osysharp.EmailTemplates;
 /// unsubscribe link when the mail is one a reader can stop.
 ///
 /// ⚑ A MAIL IS THE SENDER'S PAGE, NOT ONE OF ITS CARDS. It reads on the theme's `Bg` in its `OnBg`, the way the app's
-///   own pages read. It used to sit on a `Surface` card, and a theme whose cards are a grey panel on a white page (a
-///   shop that is black type on white) then sent every mail as a grey card — measured on a real order confirmation, it
-///   looked like no shop at all. A panel INSIDE a mail (`EmailCode`) is still a panel.
+///   own pages read. On a `Surface` card, a theme whose cards are a grey panel on a white page (a shop that is black
+///   type on white) would send every mail as a grey card that looks like no shop at all. A panel INSIDE a mail
+///   (`EmailCode`) is still a panel.
 ///
 /// `preview` is the line an inbox shows beside the subject; without one, the client shows the mail's first words.
 /// `address` is where the sender is — a marketing mail must carry it, and a receipt is better for it.

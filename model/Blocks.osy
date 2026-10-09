@@ -1,4 +1,4 @@
-// The MAIL BLOCKS — the pieces staff arrange in a mail's region (D-BLOCKS1 slice 3). Each is an `[Email]` part marked
+// The MAIL BLOCKS — the pieces staff arrange in a mail's region. Each is an `[Email]` part marked
 // `[Block]`: its parameters are the fields staff fill in at the desk, and their types choose the editor (words in the
 // Markdown editor, a picture, a page to link to, one of the theme's colours). A mail places them in a region, with the
 // arrangement the code writes as its default:

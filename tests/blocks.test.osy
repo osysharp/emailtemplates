@@ -1,4 +1,4 @@
-// A mail's REGION — the words and the pieces staff own inside a mail whose layout the code owns (D-BLOCKS1 slice 3).
+// A mail's REGION — the words and the pieces staff own inside a mail whose layout the code owns.
 // Staff arrange it the way they arrange a page's: a draft, published; words per language; placeholders filled from the
 // mail and escaped; a preview that is never sent.
 
