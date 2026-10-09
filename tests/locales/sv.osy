@@ -178,7 +178,7 @@ translations sv {
   /// __BlockSpec_SaleLines · text on the page
   text "The lines of the sale and its total." => null;
   /// __BlockSpec_SaleLines · text on the page
-  text "What was bought" => null;
+  text "Lines and total" => null;
 
   // ── __MailBlockSample ──
   /// __MailBlockSample · text on the page

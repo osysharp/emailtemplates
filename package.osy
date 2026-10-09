@@ -10,7 +10,7 @@
 //    It wears the app's theme: every colour, size and face below is a token (`Colors.Primary`), and the renderer
 //    writes the APP's value for it into the mail.
 package Osysharp.EmailTemplates {
-  version     "0.1.1";
+  version     "0.1.2";
   minPlatform "0.9.0";
   summary     "mail that looks designed — a layout with preview line, logo and footer, headings, text, buttons, pictures and receipt lines, in the app's own theme — and the mail blocks staff arrange in a mail's region.";
   model "model/*.osy";

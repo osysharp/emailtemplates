@@ -16,7 +16,7 @@ public entity Staffer {
 policy ArrangesPages => IsAuthenticated || IsAnonymous;
 
 /// A block of this app's own, handed the sale from the mail it is placed in — the lines the customer bought.
-[Block("What was bought", Hint = "The lines of the sale and its total.")]
+[Block("Lines and total", Hint = "The lines of the sale and its total.")]
 [Email]
 public component SaleLines(Sale sale, [Label("Heading"), MaxLength(60)] string heading = "Your order") {
   render {

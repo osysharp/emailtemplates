@@ -6,8 +6,8 @@
     {
       "name": "Osysharp.Blocks",
       "kind": "package",
-      "version": "1.1.0",
-      "hash": "sha256:2ca2c536187612fb43d848192a0cce47328473f1176ee55129b41132262aac02",
+      "version": "1.1.1",
+      "hash": "sha256:adff0f0485e5da9be0f0cfee0d288ebc7d173f19ce7de90aa40b3019bab1ecaa",
       "minPlatform": "0.9.0",
       "shadow": "app-forkable",
       "source": "workspace:Platform.Core/Dsl/OsySharp/Baseline/Capabilities/Blocks"
@@ -15,8 +15,8 @@
     {
       "name": "Osysharp.EmailTemplates",
       "kind": "package",
-      "version": "0.1.1",
-      "hash": "sha256:3ef5eb08590a6772a073aad43e6bae51b31126fb7ea4ce45f09d64d83200527a",
+      "version": "0.1.2",
+      "hash": "sha256:4254f7963a7b43790e4291dc1ccb28c7f24d3f9d52517ea4eb7d5aa99fa4056a",
       "minPlatform": "0.9.0",
       "shadow": "app-forkable",
       "source": "workspace:kits/emailtemplates",
@@ -25,8 +25,8 @@
     {
       "name": "Osysharp.Ui",
       "kind": "package",
-      "version": "2.17.1",
-      "hash": "sha256:17d6d844ed71d4d614d43a6993723da70b2d39241c31e9f9fb58250a5183263c",
+      "version": "2.18.1",
+      "hash": "sha256:5dae9b4103cc649967664228cc945c2d8b5bd9ff8d45e62bf9b67d9db079545e",
       "minPlatform": "0.9.0",
       "shadow": "app-forkable",
       "source": "workspace:Platform.Core/Dsl/OsySharp/Baseline/Capabilities/Ui"
@@ -35,8 +35,10 @@
   "bridges": {
     "searched": [
       "workspace",
-      "platform",
-      "github"
+      "platform"
+    ],
+    "skipped": [
+      "github: offline \u2014 the public catalog was not searched for bridges. Run \u0060osy lock\u0060 with a network to look."
     ]
   }
 }
