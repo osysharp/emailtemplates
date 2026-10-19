@@ -79,7 +79,7 @@ writes the **app's** value for each into the mail — so a shop whose brand is o
 ### The mail blocks — what staff arrange
 
 A mail's words that staff own are a `Region` of blocks (`use Osysharp.Blocks;` in the app), arranged at the page desk
-(`Osysharp.Pages`) like a page's — a draft, published, in each language, with the mail itself previewed beside it. The
+(`Osysharp.PageBuilder`) like a page's — a draft, published, in each language, with the mail itself previewed beside it. The
 kit ships the everyday blocks, each an `[Email]` part marked `[Block]` whose words fill the mail's `{placeholders}`:
 
 | block | staff fill in |
