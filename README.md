@@ -119,3 +119,71 @@ The reference: `osy docs ui-email` (the `[Email]` render target) and `osy docs u
 ## Source
 
 `model/Parts.osy` (the parts) and `model/Blocks.osy` (the mail blocks) — two files of Osy#.
+
+## Examples
+
+Taken from this package's own tests, which compile and run on every release.
+
+```osy
+using Osysharp.Blocks;
+
+[Test]
+void the_code_s_arrangement_is_the_mail_until_staff_change_it() {
+  var mail = ThanksMail(Ada("Ada"));
+  Assert.Contains("Thank you, <strong>Ada</strong> — order <span style=\"white-space:nowrap;\">GG-2001</span> is on its way to being packed.", mail.Html);
+  Assert.Contains("Thank you, Ada — order GG-2001 is on its way", mail.Text);
+  // The block handed the sale from the mail: its lines.
+  Assert.Contains("1 × Paper filters", mail.Text);
+  Assert.Contains("29.00 kr", mail.Text);
+  Assert.Equal(2, mail.Placeholders.Count);
+  Assert.False(mail.IsPreview);
+}
+```
+
+From [`tests/blocks.test.osy`](tests/blocks.test.osy).
+
+```osy
+[Test]
+void TheReceiptSaysWhatWasBought_InBothTheHtmlAndTheText() {
+  var mail = SaleReceipt(ASale());
+  Assert.Equal("Your receipt GG-1042", mail.Subject);
+  foreach (var words in new List<string> { "Thank you, Ada", "2 × Ethiopia Yirgacheffe", "250 g", "178.00 kr",
+                                            "1 × Paper filters", "29.00 kr", "Total", "207.00 kr", "See your order",
+                                            "GIFT-7Q2K", "Questions? Reply to this mail." }) {
+    Assert.Contains(words, mail.Text);
+  }
+  Assert.Contains("See your order: https://shop.example.com/orders/GG-1042", mail.Text);
+  Assert.Contains("207.00&nbsp;kr", mail.Html);                 // an amount and its currency never part
+}
+```
+
+From [`tests/receipt.test.osy`](tests/receipt.test.osy).
+
+```osy
+using Osysharp.Blocks;
+
+[Test]
+void staff_words_published_in_the_region_are_the_mail_without_a_deploy() {
+  var draft = EditRegion(MainVersion().Id, "thanks", "");
+  Assert.Equal("", SaveBlockValue(WordsIn(draft), "en", new BlockValue { Name = "words", Text = "Welcome back, {customer.name}! We are on it." }));
+  // A draft is nobody's mail yet.
+  Assert.Contains("on its way to being packed", ThanksMail(Ada("Ada")).Text);
+  Assert.Equal("", PublishRegion(draft));
+  var mail = ThanksMail(Ada("Ada"));
+  Assert.Contains("Welcome back, Ada! We are on it.", mail.Text);
+  Assert.DoesNotContain("on its way to being packed", mail.Html);
+}
+```
+
+From [`tests/blocks.test.osy`](tests/blocks.test.osy).
+
+## Learn more
+
+- [The Osysharp.EmailTemplates reference](https://osysharp.com/reference/ui/email-templates-kit/)
+- [Osysharp.EmailTemplates in the package catalogue](https://osysharp.com/packages/#osysharp-emailtemplates)
+- [The Osy# reference](https://osysharp.com/reference/) — the language, the runtime and every kit
+- [`llms-full.txt`](https://osysharp.com/llms-full.txt) — the whole reference and specification as one Markdown file, for a coding agent
+
+## Licence
+
+MIT — see [`LICENSE`](LICENSE).
